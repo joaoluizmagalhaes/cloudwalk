@@ -70,7 +70,7 @@ export default function Home() {
         })}
       </div>
       <div className='flex justify-center'>
-        <button className='w-[486px] font-arial border border-textBlue text-textBlue text-sm uppercase h-11'>Load More</button>
+        <button className='w-48 md:w-[486px] font-arial border border-textBlue text-textBlue text-sm uppercase h-11'>Load More</button>
       </div>
      </section>
     </main>
