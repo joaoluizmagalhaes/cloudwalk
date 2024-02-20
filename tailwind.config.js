@@ -18,6 +18,8 @@ module.exports = {
         labelGray: '#666666',
         filterGray: '#C8C8C8',
         textBlue: '#002B56',
+        darkGray: '#333333',
+        cardGray: '#757575'
 
       },
       fontFamily: {
@@ -27,6 +29,7 @@ module.exports = {
       fontSize: {
         '1.5xl': '20px',
         '3.5xl': '32px',
+        '3.75xl': '34px',
         '5.5xl': '54px'
       }
     },

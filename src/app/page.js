@@ -3,17 +3,49 @@
 import { useState } from 'react'
 
 import Filter from './components/Filter'
+import Card from './components/Card'
 
 
 export default function Home() {
 
-  const [selectedFilter, setSelectedFilter] = useState('')
-  
   const options = [
     { value: 'all', label: 'All'},
-    { value: '1', label: '1'}
+    { value: 'tatooine', label: 'Tatooine'}
   ]
 
+  const cardData = [
+    {
+      name: 'Luke Skywalker',
+      planet: 'Tatooine',
+      height: '172',
+      mass: '77',
+      gender: 'Male'
+    },
+    {
+      name: 'C-3PO',
+      planet: 'Tatooine',
+      height: '167',
+      mass: '75',
+      gender: 'n/a'
+    },
+    {
+      name: 'R2-D2',
+      planet: 'Naboo',
+      height: '96',
+      mass: '32',
+      gender: 'N/a'
+    },
+    {
+      name: 'Darth Vader',
+      planet: 'Tatooine',
+      height: '202',
+      mass: '136',
+      gender: 'Male'
+    }
+  ]
+
+  const [selectedFilter, setSelectedFilter] = useState(options[0].value)
+  
   const handleFilterChange = (value) => {
     setSelectedFilter(value)
   }
@@ -28,7 +60,15 @@ export default function Home() {
       <Filter options={options} onChange={handleFilterChange} />
       <button className='hidden md:flex items-center uppercase border border-filterGray text-filterGray tracking-[0.8px] font-arial text-sm h-9 px-10'>Clear all</button>
      </div>
-     <section>
+     <section className="p-[25px] md:p-[50px]">
+      <h1 className='capitalize font-sans text-darkGray font-light text-3.5xl md:text-3.75xl'>{selectedFilter} Characters</h1>
+      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 w-full gap-y-11 md:gap-8 md:gap-y-28 my-8'>
+        {cardData.map( data => {
+          return (
+            <Card data={data} />
+          )
+        })}
+      </div>
      </section>
     </main>
   )
