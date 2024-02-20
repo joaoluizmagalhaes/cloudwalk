@@ -1,37 +1,35 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 export default function FilterSelect({ options, onChange }) {
 
-  const [selectedValue, setSelectedValue] = useState(options[0]?.value)
-  const selectRef = useRef()
+  const selectRef = useRef(null)
 
   useEffect(() => {
     const handleChange = () => {
-      const value = selectRef.current.value;
-      setSelectedValue(value);
-      console.log("Valor selecionado:", value);
-    };
+      if (selectRef.current) {
+        const selectedValue = selectRef.current.value
+        onChange(selectedValue)
+      }
+    }
 
-    const selectElement = selectRef.current;
-    selectElement.addEventListener('change', handleChange);
+    const selectEl = selectRef.current
+    selectEl.addEventListener('change', handleChange)
 
     return () => {
-      selectElement.removeEventListener('change', handleChange);
-    };
-  }, [])
-
+      selectEl.removeEventListener('change', handleChange)
+    }
+  }, [onChange])
 
   return (
-    <div className="relative">
-      <select ref={selectRef} className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
+    <div className="text-base font-sans font-normal leading-[19.09px] text-labelGray flex w-full md:w-72 items-center">
+      <p className="flex min-w-[70px]">Filter By:</p>
+      <select name="filterPlanet" ref={selectRef} className="flex border-0 border-b text-textBlue border-b-filterGray w-full md:w-48 ml-3 py-2 md:py-3 ">
+        {options.map(option => (
+          <option key={option.value} value={option.value}>{option.label}</option>
         ))}
       </select>
     </div>
-  );
+  )
 }

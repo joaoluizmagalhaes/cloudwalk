@@ -16,7 +16,6 @@ export default function Home() {
 
   const handleFilterChange = (value) => {
     setSelectedFilter(value)
-    console.log("Filtro selecionado:", value)
   }
 
   return (
@@ -25,8 +24,9 @@ export default function Home() {
       <h1 className="text-3.5xl md:text-5.5xl leading-10 md:leading-[64px] mb-2.5 md:mb-6">Star Wars Characters</h1>
       <p className="text-base md:text-1.5xl leading-6 md:leading-[32px] tracking-[0.92px] max-w-[920px]">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
      </header>
-     <div className="h-[90px] border-t md:border-y border-customGray w-full px-[25px] md:px-[50px]">
+     <div className="h-14 md:h-[90px] flex justify-between items-center border-t md:border-y border-borderGray w-full px-[25px] md:px-[50px]">
       <Filter options={options} onChange={handleFilterChange} />
+      <button className='hidden md:flex items-center uppercase border border-filterGray text-filterGray tracking-[0.8px] font-arial text-sm h-9 px-10'>Clear all</button>
      </div>
      <section>
      </section>
