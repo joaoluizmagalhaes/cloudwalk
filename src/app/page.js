@@ -65,9 +65,12 @@ export default function Home() {
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 w-full gap-y-11 md:gap-8 md:gap-y-28 my-8'>
         {cardData.map( data => {
           return (
-            <Card data={data} />
+            <Card data={data} key={data.name}/>
           )
         })}
+      </div>
+      <div>
+        <button>Load More</button>
       </div>
      </section>
     </main>
