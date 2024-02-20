@@ -62,15 +62,15 @@ export default function Home() {
      </div>
      <section className="p-[25px] md:p-[50px]">
       <h1 className='capitalize font-sans text-darkGray font-light text-3.5xl md:text-3.75xl'>{selectedFilter} Characters</h1>
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 w-full gap-y-11 md:gap-8 md:gap-y-28 my-8'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 w-full gap-y-11 md:gap-8 md:gap-y-28 my-8 mb-11 md:mb-28'>
         {cardData.map( data => {
           return (
             <Card data={data} key={data.name}/>
           )
         })}
       </div>
-      <div>
-        <button>Load More</button>
+      <div className='flex justify-center'>
+        <button className='w-[486px] font-arial border border-textBlue text-textBlue text-sm uppercase h-11'>Load More</button>
       </div>
      </section>
     </main>
