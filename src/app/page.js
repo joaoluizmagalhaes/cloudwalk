@@ -12,79 +12,69 @@ export default function Home() {
   const [planetOptions, setPlanetOptions] = useState([])
 
   useEffect(() => {
-
     setPlanetOptions([])
     setCardData([])
 
-    async function fetchPlanets(pageURL, setPlanetOptions) {
+    setPlanetOptions(prevData => [...prevData, {label: 'All', value: 'All'}])
+
+    async function fetchPlanets(pageURL) {
       try {
-
         const response = await fetch(pageURL)
-
         if (!response.ok) {
           throw new Error('Falha na rede')
         }
-
         const data = await response.json()
-
         const enrichedData = data.results.map(element => ({
           value: element.name,
           label: element.name,
           url: element.url
         }))
-
-        setPlanetOptions(prevData => [...prevData, ...enrichedData]) 
-        console.log('here', data)
-
-        if (data.next) { 
-          await fetchPlanets(data.next, setPlanetOptions) 
+        setPlanetOptions(prevData => [...prevData, ...enrichedData])
+        if (data.next) {
+          await fetchPlanets(data.next)
         }
-
       } catch (error) {
         console.error('Erro ao buscar dados:', error)
       }
     }
 
-    async function fetchPeople(planetOptions, setCardData) {
-      try {
-
-        const response = await fetch(`${window.location.origin}/api?endpoint=people`)
-
-        if (!response.ok) {
-          throw new Error('Falha na rede')
-        }
-
-        const data = await response.json()
-        
-        const planetMap = planetOptions.reduce((map, planet) => {
-          map[planet.url] = planet.name
-          return map
-        }, {})
-
-        const enrichedData = data.results.slice(0, 8).map(element => { 
-          const planetName = planetMap[element.homeworld] 
-          const random = Math.floor(Math.random() * 100)
-          return {
-            ...element,
-            homeworldName: planetName,
-            imageURL: `https://picsum.photos/435/230?random=${random}`
-          }
-        })
-
-        setCardData(enrichedData)
-
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error)
-      }
-    }
-
-    fetchPlanets(`${window.location.origin}/api?endpoint=planets`, setPlanetOptions)
-    
-    fetchPeople(planetOptions, setCardData)
-    
+    fetchPlanets(`${window.location.origin}/api?endpoint=planets`)
   }, [])
-  
 
+  useEffect(() => {
+    // Certifique-se de que planetOptions não está vazio antes de chamar fetchPeople
+    if (planetOptions.length > 0) {
+      async function fetchPeople() {
+        try {
+          const response = await fetch(`${window.location.origin}/api?endpoint=people`)
+          if (!response.ok) {
+            throw new Error('Falha na rede')
+          }
+          const data = await response.json()
+          const planetMap = planetOptions.reduce((map, planet) => {
+            map[planet.url] = planet.value
+            return map
+          }, {})
+          
+          const enrichedData = data.results.slice(0, 8).map(element => {
+            const planetName = planetMap[element.homeworld]
+            const random = Math.floor(Math.random() * 100)
+            return {
+              ...element,
+              homeworld: planetName,
+              imageURL: `https://picsum.photos/435/230?random=${random}`
+            }
+          })
+          setCardData(enrichedData)
+        } catch (error) {
+          console.error('Erro ao buscar dados:', error)
+        }
+      }
+      fetchPeople()
+    }
+  }, [planetOptions]) // Este useEffect agora depende de planetOptions
+
+  
   const [selectedFilter, setSelectedFilter] = useState('All')
   
   const handleFilterChange = (value) => {
@@ -103,7 +93,7 @@ export default function Home() {
      </div>
      <section className="p-[25px] md:p-[50px]">
       <h1 className='capitalize font-sans text-darkGray font-light text-3.5xl md:text-3.75xl'>{selectedFilter} Characters</h1>
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 w-full gap-y-11 md:gap-8 md:gap-y-28 my-8 mb-11 md:mb-28'>
+      <div className='grid grid-cols-1 md:grid-cols-4 w-full gap-y-11 md:gap-8 md:gap-y-28 my-8 mb-11 md:mb-28'>
         {cardData.map( data => {
           return (
             <Card data={data} key={data.name}/>
