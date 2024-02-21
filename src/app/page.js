@@ -4,17 +4,19 @@ import { useEffect, useState } from 'react'
 
 import Filter from './components/Filter'
 import Card from './components/Card'
+import Loading from './components/Loading'
 
 
 export default function Home() {
 
   const [cardData, setCardData] = useState([]) 
   const [planetOptions, setPlanetOptions] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
+    setIsLoading(true)
     setPlanetOptions([])
     setCardData([])
-
     setPlanetOptions(prevData => [...prevData, {label: 'All', value: 'All'}])
 
     async function fetchPlanets(pageURL) {
@@ -35,6 +37,7 @@ export default function Home() {
         }
       } catch (error) {
         console.error('Erro ao buscar dados:', error)
+        setIsLoading(false)
       }
     }
 
@@ -68,6 +71,8 @@ export default function Home() {
           setCardData(enrichedData)
         } catch (error) {
           console.error('Erro ao buscar dados:', error)
+        } finally {
+          setIsLoading(false)
         }
       }
       fetchPeople()
@@ -82,7 +87,8 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col w-full py-20">
+    <main className="flex min-h-screen flex-col w-full py-20 relative">
+      {isLoading && <Loading /> }
      <header className="flex flex-col w-full font-sans font-light mb-7 px-[25px] md:px-[50px]">
       <h1 className="text-3.5xl md:text-5.5xl leading-10 md:leading-[64px] mb-2.5 md:mb-6">Star Wars Characters</h1>
       <p className="text-base md:text-1.5xl leading-6 md:leading-[32px] tracking-[0.92px] max-w-[920px]">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>

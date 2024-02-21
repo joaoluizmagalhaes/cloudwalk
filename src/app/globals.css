@@ -2,4 +2,5 @@
 @tailwind components;
 @tailwind utilities;
 
-@import './styles/fonts.css'
+@import './styles/fonts.css';
+@import './styles//spinner.css';

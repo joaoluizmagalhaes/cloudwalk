@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react'
 export default function FilterSelect({ options, onChange }) {
 
   const selectRef = useRef(null)
+  
 
   useEffect(() => {
     const handleChange = () => {
