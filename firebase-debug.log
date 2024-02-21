@@ -1,0 +1,18 @@
+[debug] [2024-02-21T21:07:21.084Z] ----------------------------------------------------------------------
+[debug] [2024-02-21T21:07:21.085Z] Command:       /Users/joaoluizdefigueiredomagalhaes/.nvm/versions/node/v18.19.1/bin/node /Users/joaoluizdefigueiredomagalhaes/.nvm/versions/node/v18.19.1/bin/firebase deploy
+[debug] [2024-02-21T21:07:21.085Z] CLI Version:   13.3.0
+[debug] [2024-02-21T21:07:21.086Z] Platform:      darwin
+[debug] [2024-02-21T21:07:21.086Z] Node Version:  v18.19.1
+[debug] [2024-02-21T21:07:21.086Z] Time:          Wed Feb 21 2024 18:07:21 GMT-0300 (Brasilia Standard Time)
+[debug] [2024-02-21T21:07:21.086Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-02-21T21:07:21.120Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-02-21T21:07:21.120Z] > authorizing via signed-in user (dukejlf@gmail.com)
+[debug] [2024-02-21T21:07:21.120Z] [iam] checking project cloudwalk-6f247 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2024-02-21T21:07:21.121Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/cloudwalk-6f247:testIamPermissions [none]
+[debug] [2024-02-21T21:07:21.121Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/cloudwalk-6f247:testIamPermissions x-goog-quota-user=projects/cloudwalk-6f247
+[debug] [2024-02-21T21:07:21.121Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cloudwalk-6f247:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-02-21T21:07:24.272Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/cloudwalk-6f247:testIamPermissions 200
+[debug] [2024-02-21T21:07:24.273Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cloudwalk-6f247:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-02-21T21:07:24.274Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/cloudwalk-6f247 [none]
+[debug] [2024-02-21T21:07:25.887Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/cloudwalk-6f247 200

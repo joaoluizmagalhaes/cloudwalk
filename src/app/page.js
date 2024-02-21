@@ -8,16 +8,19 @@ import Card from './components/Card'
 
 export default function Home() {
 
-  const options = [
-    { value: 'all', label: 'All'},
-    { value: 'tatooine', label: 'Tatooine'}
-  ]
+  
 
   const [cardData, setCardData] = useState([]) 
-  const [pageURL, setPageURL] = useState('')
+  const [planetOptions, setPlanetOptions] = useState([])
 
   useEffect(() => {
-    setPageURL(window.location.href)
+
+    const initialURL = `${window.location.origin}/api?endpoint=planets`
+
+    setCardData([])
+
+    fetchPlanets(initialURL, setPlanetOptions)
+
     fetch(`${pageURL}/api?endpoint=people`)
     .then(response => {
       if (!response.ok) {
@@ -75,4 +78,24 @@ export default function Home() {
      </section>
     </main>
   )
+}
+
+async function fetchPlanets(pageURL, setPlanetOptions) {
+  fetch(pageURL)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Falha na rede');
+      }
+      return response.json();
+    })
+    .then(data => {
+      const enrichedData = data.results.map(element => ({ planet: element.name }));
+      setPlanetOptions(prevData => [...prevData, ...enrichedData]); // Concatena com dados existentes
+      if (data.next) {
+        fetchPlanets(data.next, setPlanetOptions); // Chama recursivamente se houver uma próxima página
+      }
+    })
+    .catch(error => {
+      console.error('Erro ao buscar dados:', error);
+    });
 }
