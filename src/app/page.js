@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Filter from './components/Filter'
 import Card from './components/Card'
@@ -13,36 +13,35 @@ export default function Home() {
     { value: 'tatooine', label: 'Tatooine'}
   ]
 
-  const cardData = [
-    {
-      name: 'Luke Skywalker',
-      planet: 'Tatooine',
-      height: '172',
-      mass: '77',
-      gender: 'Male'
-    },
-    {
-      name: 'C-3PO',
-      planet: 'Tatooine',
-      height: '167',
-      mass: '75',
-      gender: 'n/a'
-    },
-    {
-      name: 'R2-D2',
-      planet: 'Naboo',
-      height: '96',
-      mass: '32',
-      gender: 'N/a'
-    },
-    {
-      name: 'Darth Vader',
-      planet: 'Tatooine',
-      height: '202',
-      mass: '136',
-      gender: 'Male'
-    }
-  ]
+  const [cardData, setCardData] = useState([]) 
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api?endpoint=people')
+      .then(response => {
+        if (!response.ok) {
+          console.log(response)
+          throw new Error('Falha na rede');
+        }
+        return response.json(); // Converte a resposta para JSON
+      })
+      .then(data => {
+        const enrichedData = data.results.map(element => {
+          // Gera um número aleatório para cada elemento apenas uma vez
+          const random = Math.floor(Math.random() * 100);
+          return {
+            ...element,
+            imageURL: `https://picsum.photos/435/230?random=${random}`
+          };
+        });
+        
+        setCardData(enrichedData)
+        console.log('Dados recebidos:', data); // Logs the fetched data
+      })
+      .catch(error => {
+        console.error('Erro ao buscar dados:', error);
+      });
+  }, [])
+  
 
   const [selectedFilter, setSelectedFilter] = useState(options[0].value)
   
