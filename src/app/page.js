@@ -14,9 +14,11 @@ export default function Home() {
   ]
 
   const [cardData, setCardData] = useState([]) 
+  const [pageURL, setPageURL] = useState('')
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api?endpoint=people`)
+    setPageURL(window.location.href)
+    fetch(`${pageURL}/api?endpoint=people`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Falha na rede')
