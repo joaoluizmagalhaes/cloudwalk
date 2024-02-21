@@ -16,30 +16,29 @@ export default function Home() {
   const [cardData, setCardData] = useState([]) 
 
   useEffect(() => {
-    fetch('http://localhost:3000/api?endpoint=people')
-      .then(response => {
-        if (!response.ok) {
-          console.log(response)
-          throw new Error('Falha na rede');
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api?endpoint=people`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Falha na rede')
+      }
+      return response.json() 
+    })
+    .then(data => {
+      const enrichedData = data.results.map(element => {
+       
+        const random = Math.floor(Math.random() * 100)
+        return {
+          ...element,
+          imageURL: `https://picsum.photos/435/230?random=${random}`
         }
-        return response.json(); // Converte a resposta para JSON
       })
-      .then(data => {
-        const enrichedData = data.results.map(element => {
-          // Gera um número aleatório para cada elemento apenas uma vez
-          const random = Math.floor(Math.random() * 100);
-          return {
-            ...element,
-            imageURL: `https://picsum.photos/435/230?random=${random}`
-          };
-        });
-        
-        setCardData(enrichedData)
-        console.log('Dados recebidos:', data); // Logs the fetched data
-      })
-      .catch(error => {
-        console.error('Erro ao buscar dados:', error);
-      });
+      
+      setCardData(enrichedData)
+      console.log('Dados recebidos:', data) 
+    })
+    .catch(error => {
+      console.error('Erro ao buscar dados:', error)
+    })
   }, [])
   
 
