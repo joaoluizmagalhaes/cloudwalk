@@ -8,46 +8,84 @@ import Card from './components/Card'
 
 export default function Home() {
 
-  
-
   const [cardData, setCardData] = useState([]) 
   const [planetOptions, setPlanetOptions] = useState([])
 
   useEffect(() => {
 
-    const initialURL = `${window.location.origin}/api?endpoint=planets`
-
+    setPlanetOptions([])
     setCardData([])
 
-    fetchPlanets(initialURL, setPlanetOptions)
+    async function fetchPlanets(pageURL, setPlanetOptions) {
+      try {
 
-    fetch(`${pageURL}/api?endpoint=people`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Falha na rede')
-      }
-      return response.json() 
-    })
-    .then(data => {
-      const enrichedData = data.results.map(element => {
-       
-        const random = Math.floor(Math.random() * 100)
-        return {
-          ...element,
-          imageURL: `https://picsum.photos/435/230?random=${random}`
+        const response = await fetch(pageURL)
+
+        if (!response.ok) {
+          throw new Error('Falha na rede')
         }
-      })
-      
-      setCardData(enrichedData)
-      console.log('Dados recebidos:', data) 
-    })
-    .catch(error => {
-      console.error('Erro ao buscar dados:', error)
-    })
+
+        const data = await response.json()
+
+        const enrichedData = data.results.map(element => ({
+          value: element.name,
+          label: element.name,
+          url: element.url
+        }))
+
+        setPlanetOptions(prevData => [...prevData, ...enrichedData]) 
+        console.log('here', data)
+
+        if (data.next) { 
+          await fetchPlanets(data.next, setPlanetOptions) 
+        }
+
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error)
+      }
+    }
+
+    async function fetchPeople(planetOptions, setCardData) {
+      try {
+
+        const response = await fetch(`${window.location.origin}/api?endpoint=people`)
+
+        if (!response.ok) {
+          throw new Error('Falha na rede')
+        }
+
+        const data = await response.json()
+        
+        const planetMap = planetOptions.reduce((map, planet) => {
+          map[planet.url] = planet.name
+          return map
+        }, {})
+
+        const enrichedData = data.results.slice(0, 8).map(element => { 
+          const planetName = planetMap[element.homeworld] 
+          const random = Math.floor(Math.random() * 100)
+          return {
+            ...element,
+            homeworldName: planetName,
+            imageURL: `https://picsum.photos/435/230?random=${random}`
+          }
+        })
+
+        setCardData(enrichedData)
+
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error)
+      }
+    }
+
+    fetchPlanets(`${window.location.origin}/api?endpoint=planets`, setPlanetOptions)
+    
+    fetchPeople(planetOptions, setCardData)
+    
   }, [])
   
 
-  const [selectedFilter, setSelectedFilter] = useState(options[0].value)
+  const [selectedFilter, setSelectedFilter] = useState('All')
   
   const handleFilterChange = (value) => {
     setSelectedFilter(value)
@@ -60,7 +98,7 @@ export default function Home() {
       <p className="text-base md:text-1.5xl leading-6 md:leading-[32px] tracking-[0.92px] max-w-[920px]">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
      </header>
      <div className="h-14 md:h-[90px] flex justify-between items-center border-t md:border-y border-borderGray w-full px-[25px] md:px-[50px]">
-      <Filter options={options} onChange={handleFilterChange} />
+      <Filter options={planetOptions} onChange={handleFilterChange} />
       <button className='hidden md:flex items-center uppercase border border-filterGray text-filterGray tracking-[0.8px] font-arial text-sm h-9 px-10'>Clear all</button>
      </div>
      <section className="p-[25px] md:p-[50px]">
@@ -78,24 +116,4 @@ export default function Home() {
      </section>
     </main>
   )
-}
-
-async function fetchPlanets(pageURL, setPlanetOptions) {
-  fetch(pageURL)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Falha na rede');
-      }
-      return response.json();
-    })
-    .then(data => {
-      const enrichedData = data.results.map(element => ({ planet: element.name }));
-      setPlanetOptions(prevData => [...prevData, ...enrichedData]); // Concatena com dados existentes
-      if (data.next) {
-        fetchPlanets(data.next, setPlanetOptions); // Chama recursivamente se houver uma próxima página
-      }
-    })
-    .catch(error => {
-      console.error('Erro ao buscar dados:', error);
-    });
 }
