@@ -99,8 +99,6 @@ export default function Home() {
 
         const newPeople = data.results.map(person => {
           const random = Math.floor(Math.random() * 100)
-          console.log('planet',person.homeworld)
-          console.log('map', planetMap)
           return {
             ...person,
             homeworld: planetMap[person.homeworld] || 'Unknown Planet',
