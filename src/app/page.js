@@ -7,92 +7,118 @@ import Loading from './components/Loading'
 
 export default function Home() {
 
+  const [selectedFilter, setSelectedFilter] = useState('All')
   const [planetOptions, setPlanetOptions] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-  const [allPeople, setAllPeople] = useState([])
+  const [people, setPeople] = useState([])
   const [displayCount, setDisplayCount] = useState(8)
-  const [selectedFilter, setSelectedFilter] = useState('All')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [planetsLoaded, setPlanetsLoaded] = useState(false)
   const [totalPeopleCount, setTotalPeopleCount] = useState(0)
+  const [isFetchingMore, setIsFetchingMore] = useState(false)
+  const [planetsLoaded, setPlanetsLoaded] = useState(false)
+  const [disabledLoadMore, setDisabledLoadMore] = useState(true)
 
   useEffect(() => {
     setIsLoading(true)
-    setPlanetOptions(prevData => [...prevData, { label: 'All', value: 'All' }])
-
-    async function fetchPlanets(pageURL) {
-      
-      const cachedPlanets = localStorage.getItem('planetOptions')
-      const cachedPlanetCount = localStorage.getItem('planetCount')
-
-      if (cachedPlanets && cachedPlanetCount && JSON.parse(cachedPlanets).length >= cachedPlanetCount) {
-        setPlanetOptions(JSON.parse(cachedPlanets))
-        setPlanetsLoaded(true)
-        setIsLoading(false)
-        return
-      }
-      
-      try {
-        const response = await fetch(pageURL)
-
-        if (!response.ok) {
-          throw new Error('Falha na rede')
-        }
-
-        const data = await response.json()
-        localStorage.setItem('planetCount', JSON.stringify(data.count))
-        
-        const enrichedData = data.results.map(element => ({
-          value: element.name,
-          label: element.name,
-          url: element.url
-        }))
-
-        setPlanetOptions(prevData => {
-          const updatedData = [...prevData, ...enrichedData]
-          localStorage.setItem('planetOptions', JSON.stringify(updatedData))
-          return updatedData
-        })
-
-        if (data.next) {
-          await fetchPlanets(data.next)
-        } else {
-          setPlanetsLoaded(true)
-          setIsLoading(false)
-        }
-
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error)
-        setIsLoading(false)
-      }
-    }
-
+    setPlanetOptions(prevData => {
+      if(!prevData.includes({ label: 'All', value: 'All' })){
+        return [...prevData, { label: 'All', value: 'All' }]
+      }}) 
     fetchPlanets(`${window.location.origin}/api?endpoint=planets`)
+    
   }, [])
 
   useEffect(() => {
     if (planetsLoaded) {
-      fetchPeople()
+      fetchPeople(`${window.location.origin}/api?endpoint=people&page=1`)
     }
-  }, [planetOptions, planetsLoaded, currentPage])
+  }, [planetOptions, planetsLoaded])
 
-  async function fetchPeople() {
-    if (allPeople.length <= totalPeopleCount || currentPage === 1) {
+  useEffect(() => {
+    if (people.length > 0 && people.length < totalPeopleCount && !isFetchingMore) {
+      fetchRemainingPeople()
+    }
+  }, [people, totalPeopleCount])
 
-      setIsLoading(true)
+  async function fetchPlanets(url) {
+    
+    const cachedPlanets = localStorage.getItem('planetOptions')
+    const cachedPlanetCount = localStorage.getItem('planetCount')
 
-      try {
-        const response = await fetch(`${window.location.origin}/api/?endpoint=people&page=${currentPage}`)
+    if (cachedPlanets && cachedPlanetCount && JSON.parse(cachedPlanets).length >= cachedPlanetCount) {
+      setPlanetOptions(JSON.parse(cachedPlanets))
+      setPlanetsLoaded(true)
+      return
+    }
+    
+    try {
+      const response = await fetch(url)
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok ' + response)
+      if (!response.ok) {
+        throw new Error('Falha na rede')
+      }
+
+      const data = await response.json()
+      localStorage.setItem('planetCount', JSON.stringify(data.count))
+      
+      const enrichedData = data.results.map(element => ({
+        value: element.residents,
+        label: element.name,
+        url: element.url 
+      }))
+
+      setPlanetOptions(prevData => {
+        const updatedData = [...prevData, ...enrichedData]
+        localStorage.setItem('planetOptions', JSON.stringify(updatedData))
+        return updatedData
+      })
+
+      if (data.next) {
+        await fetchPlanets(data.next)
+      } else {
+        setPlanetsLoaded(true)
+      }
+
+    } catch (error) {
+      console.error('Erro ao buscar dados:', error)
+      setIsLoading(false)
+    }
+  }
+
+  async function fetchPeople(url) {
+    try {
+      const response = await fetch(url)
+      const data = await response.json()
+      
+      const planetMap = planetOptions.reduce((acc, planet) => {
+        acc[planet.url] = planet.label
+        return acc
+      }, {})
+
+      const newPeople = data.results.map(person => {
+        const random = Math.floor(Math.random() * 100)
+        return {
+          ...person,
+          homeworld: planetMap[person.homeworld] || 'Unknown Planet',
+          imageURL: `https://picsum.photos/435/230?random=${random}`
         }
+      })
 
+
+      setTotalPeopleCount(data.count)
+      setPeople(prev => [...prev, ...newPeople])
+      setIsLoading(false)
+    } catch (error) {
+      console.error("Failed to fetch people:", error)
+      setIsLoading(false)
+    }
+  }
+
+  async function fetchRemainingPeople(page = 2) {
+    setIsFetchingMore(true)
+    try {
+      while (people.length < totalPeopleCount) {
+        const response = await fetch(`${window.location.origin}/api?endpoint=people&page=${page}`)
         const data = await response.json()
-        if (currentPage === 1) {
-          setTotalPeopleCount(data.count)
-        }
-
         const planetMap = planetOptions.reduce((acc, planet) => {
           acc[planet.url] = planet.label
           return acc
@@ -107,32 +133,35 @@ export default function Home() {
           }
         })
 
-        setAllPeople(prev => [...prev, ...newPeople])
-
-      } catch (error) {
-        console.error("Failed to fetch people:", error)
-      } finally {
-        setIsLoading(false)
+        setPeople(prev => [...prev, ...newPeople])
+        if (!data.next) {
+          setDisabledLoadMore(false)
+          break
+        }
+        page += 1
       }
-
+    } catch (error) {
+      console.error("Failed to fetch remaining people:", error)
+    } finally {
+      setIsFetchingMore(false)
     }
   }
 
   const handleLoadMore = () => {
 
-    const newDisplayCount = displayCount + 8 <= totalPeopleCount ? displayCount + 8 : totalPeopleCount
+    let newDisplayCount = displayCount + 8
 
-    if (newDisplayCount <= totalPeopleCount) {
-      setDisplayCount(newDisplayCount)
-      if (newDisplayCount >= allPeople.length) {
-        setCurrentPage(prev => prev + 1)
-      }
+    if (newDisplayCount > people.length) {
+      newDisplayCount = people.length
     }
 
+    setDisplayCount(newDisplayCount)
   }
 
-  const handleFilterChange = (value) => {
-    setSelectedFilter(value)
+
+
+  const handleFilterChange = (selected) => {
+    setSelectedFilter(selected.label)
   }
 
   return (
@@ -151,14 +180,22 @@ export default function Home() {
       <section className="p-[25px] md:p-[50px]">
         <h1 className='capitalize font-sans text-darkGray font-light text-3.5xl md:text-3.75xl'>{selectedFilter} Characters</h1>
         <div className='grid grid-cols-1 md:grid-cols-4 w-full gap-y-11 md:gap-8 md:gap-y-28 my-8 mb-11 md:mb-28'>
-          {allPeople.slice(0, displayCount).map((person, index) => (
+          {people.slice(0, displayCount).map((person, index) => (
             <Card key={index} data={person} />
           ))}
         </div>
         {displayCount < totalPeopleCount && (
           <div className='flex justify-center'>
-            <button onClick={handleLoadMore} className='w-48 md:w-[486px] font-arial border border-textBlue text-textBlue text-sm uppercase h-11'>
-              Load More
+            <button 
+              onClick={handleLoadMore} 
+              disabled={disabledLoadMore} 
+              className={`disabled:opacity-50 w-48 md:w-[486px] font-arial border border-textBlue text-textBlue text-sm uppercase h-11 ${disabledLoadMore ? 'additional-disabled-class' : ''}`}
+            >
+              {disabledLoadMore ? (
+                <span className='btn-loader'></span>
+              ) : (
+                'Load More'
+              )}
             </button>
           </div>
         )}

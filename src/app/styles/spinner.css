@@ -27,3 +27,13 @@
     transform: rotate(360deg);
   }
 }
+
+.btn-loader {
+  display: inline-block;
+  width: 60px;
+  height: 20px;
+  aspect-ratio: 2;
+  background: radial-gradient(circle closest-side,#002B56 90%,#002B56) 0/calc(100%/3) 100% no-repeat;
+  animation: l2 1.5s steps(3) infinite;
+}
+@keyframes l2 {to{background-position: 150%}}
