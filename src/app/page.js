@@ -45,7 +45,6 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    // Certifique-se de que planetOptions não está vazio antes de chamar fetchPeople
     if (planetOptions.length > 0) {
       async function fetchPeople() {
         try {
@@ -77,7 +76,7 @@ export default function Home() {
       }
       fetchPeople()
     }
-  }, [planetOptions]) // Este useEffect agora depende de planetOptions
+  }, [planetOptions])
 
   
   const [selectedFilter, setSelectedFilter] = useState('All')
