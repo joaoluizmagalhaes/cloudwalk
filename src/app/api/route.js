@@ -8,7 +8,7 @@ export async function GET(request) {
 
   const baseUrl = 'https://swapi.dev/api/';
   const url = `${baseUrl}${endpoint}/${page}`;
-console.log(url)
+
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
