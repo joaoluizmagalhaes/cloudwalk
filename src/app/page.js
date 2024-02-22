@@ -6,7 +6,7 @@ import Card from './components/Card'
 import Loading from './components/Loading'
 
 export default function Home() {
-  const [cardData, setCardData] = useState([])
+
   const [planetOptions, setPlanetOptions] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [allPeople, setAllPeople] = useState([])
@@ -15,30 +15,51 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1)
   const [planetsLoaded, setPlanetsLoaded] = useState(false)
   const [totalPeopleCount, setTotalPeopleCount] = useState(0)
+  const [planetCount, setPlanetCount] = useState(0)
 
   useEffect(() => {
     setIsLoading(true)
     setPlanetOptions(prevData => [...prevData, { label: 'All', value: 'All' }])
 
     async function fetchPlanets(pageURL) {
+
+      const cachedPlanets = localStorage.getItem('planetOptions')
+
+      if (cachedPlanets && cachedPlanets.length >= planetCount) {
+        setPlanetOptions(JSON.parse(cachedPlanets))
+        setPlanetsLoaded(true)
+        setIsLoading(false)
+        return
+      }
+      
       try {
         const response = await fetch(pageURL)
+
         if (!response.ok) {
           throw new Error('Falha na rede')
         }
+
         const data = await response.json()
+        setPlanetCount(data.count)
         const enrichedData = data.results.map(element => ({
           value: element.name,
           label: element.name,
           url: element.url
         }))
-        setPlanetOptions(prevData => [...prevData, ...enrichedData])
+
+        setPlanetOptions(prevData => {
+          const updatedData = [...prevData, ...enrichedData]
+          localStorage.setItem('planetOptions', JSON.stringify(updatedData))
+          return updatedData
+        })
+
         if (data.next) {
           await fetchPlanets(data.next)
         } else {
           setPlanetsLoaded(true)
           setIsLoading(false)
         }
+
       } catch (error) {
         console.error('Erro ao buscar dados:', error)
         setIsLoading(false)
@@ -55,13 +76,17 @@ export default function Home() {
   }, [planetOptions, planetsLoaded, currentPage])
 
   async function fetchPeople() {
-    if (allPeople.length < totalPeopleCount || currentPage === 1) {
+    if (allPeople.length <= totalPeopleCount || currentPage === 1) {
+
       setIsLoading(true)
+
       try {
         const response = await fetch(`${window.location.origin}/api/?endpoint=people&page=${currentPage}`)
+
         if (!response.ok) {
           throw new Error('Network response was not ok')
         }
+
         const data = await response.json()
         if (currentPage === 1) {
           setTotalPeopleCount(data.count)
@@ -72,36 +97,39 @@ export default function Home() {
           return acc
         }, {})
 
-      
         const newPeople = data.results.map(person => {
-
           const random = Math.floor(Math.random() * 100)
-
+          console.log('planet',person.homeworld)
+          console.log('map', planetMap)
           return {
             ...person,
             homeworld: planetMap[person.homeworld] || 'Unknown Planet',
             imageURL: `https://picsum.photos/435/230?random=${random}`
           }
-          
         })
 
         setAllPeople(prev => [...prev, ...newPeople])
+
       } catch (error) {
         console.error("Failed to fetch people:", error)
       } finally {
         setIsLoading(false)
       }
+
     }
   }
 
   const handleLoadMore = () => {
-    const newDisplayCount = displayCount + 8
+
+    const newDisplayCount = displayCount + 8 <= totalPeopleCount ? displayCount + 8 : totalPeopleCount
+
     if (newDisplayCount <= totalPeopleCount) {
       setDisplayCount(newDisplayCount)
-      if (newDisplayCount > allPeople.length) {
+      if (newDisplayCount >= allPeople.length) {
         setCurrentPage(prev => prev + 1)
       }
     }
+
   }
 
   const handleFilterChange = (value) => {
