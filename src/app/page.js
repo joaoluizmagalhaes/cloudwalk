@@ -16,6 +16,7 @@ export default function Home() {
   const [isFetchingMore, setIsFetchingMore] = useState(false)
   const [planetsLoaded, setPlanetsLoaded] = useState(false)
   const [disabledLoadMore, setDisabledLoadMore] = useState(true)
+  const [filteredPeople, setFilteredPeople] = useState([])
 
   useEffect(() => {
     setIsLoading(true)
@@ -162,6 +163,14 @@ export default function Home() {
 
   const handleFilterChange = (selected) => {
     setSelectedFilter(selected.label)
+
+    // Filtra a lista de pessoas com base no filtro selecionado
+    const filteredPeople = selected.label === 'All' 
+      ? people 
+      : people.filter(person => selected.value.includes(person.url))
+
+    setPeople(filteredPeople) // Atualiza a lista de pessoas com o resultado filtrado
+    setDisplayCount(Math.min(filteredPeople.length, 8)) // Reinicia displayCount ou ajusta baseado no resultado filtrado
   }
 
   return (
