@@ -21,11 +21,11 @@ export default function Home() {
     setPlanetOptions(prevData => [...prevData, { label: 'All', value: 'All' }])
 
     async function fetchPlanets(pageURL) {
-
+      
       const cachedPlanets = localStorage.getItem('planetOptions')
       const cachedPlanetCount = localStorage.getItem('planetCount')
 
-      if (cachedPlanets && cachedPlanetCount && cachedPlanets.length >= cachedPlanetCount) {
+      if (cachedPlanets && cachedPlanetCount && JSON.parse(cachedPlanets).length >= cachedPlanetCount) {
         setPlanetOptions(JSON.parse(cachedPlanets))
         setPlanetsLoaded(true)
         setIsLoading(false)
