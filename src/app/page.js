@@ -15,7 +15,6 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1)
   const [planetsLoaded, setPlanetsLoaded] = useState(false)
   const [totalPeopleCount, setTotalPeopleCount] = useState(0)
-  const [planetCount, setPlanetCount] = useState(0)
 
   useEffect(() => {
     setIsLoading(true)
@@ -24,8 +23,9 @@ export default function Home() {
     async function fetchPlanets(pageURL) {
 
       const cachedPlanets = localStorage.getItem('planetOptions')
+      const cachedPlanetCount = localStorage.getItem('planetCount')
 
-      if (cachedPlanets && cachedPlanets.length >= planetCount) {
+      if (cachedPlanets && cachedPlanetCount && cachedPlanets.length >= cachedPlanetCount) {
         setPlanetOptions(JSON.parse(cachedPlanets))
         setPlanetsLoaded(true)
         setIsLoading(false)
@@ -40,7 +40,8 @@ export default function Home() {
         }
 
         const data = await response.json()
-        setPlanetCount(data.count)
+        localStorage.setItem('planetCount', JSON.stringify(data.count))
+        
         const enrichedData = data.results.map(element => ({
           value: element.name,
           label: element.name,
@@ -84,7 +85,7 @@ export default function Home() {
         const response = await fetch(`${window.location.origin}/api/?endpoint=people&page=${currentPage}`)
 
         if (!response.ok) {
-          throw new Error('Network response was not ok')
+          throw new Error('Network response was not ok ' + response)
         }
 
         const data = await response.json()
