@@ -182,7 +182,7 @@ export default function Home() {
     setDisabledClearBtn(false)
     setFilteredPeople(filtered) 
     setDisplayCount(Math.min(filtered.length, 8))
-    setTotalFilteredPeopleCount(filteredPeople.length)
+    setTotalFilteredPeopleCount(filtered.length)
   }
 
   return (
