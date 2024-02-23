@@ -70,7 +70,7 @@ const clearFilter = () => {
           onChange={handleFilterChange} 
           selectedFilter={selectedFilter}
         />
-        <button disabled={disabledClearBtn} className='hidden hover:text-white hover:bg-textBlue transition-all duration-300 ease-in-out md:flex items-center uppercase border border-textBlue text-textBlue disabled:border-filterGray disabled:text-filterGray tracking-[0.8px] font-arial text-sm h-9 px-10' onClick={clearFilter}>Clear all</button>
+        <button disabled={disabledClearBtn} className='hidden hover:text-white hover:bg-textBlue transition-all duration-300 ease-in-out md:flex items-center uppercase border border-textBlue text-textBlue disabled:border-filterGray disabled:text-filterGray tracking-[0.8px] font-arial text-sm h-9 px-10 disabled:pointer-events-none disabled:cursor-default' onClick={clearFilter}>Clear all</button>
       </div>
       <section className='p-[25px] md:p-[50px]'>
         <h1 className={`${filteredPeople.length > 0 ? 'capitalize' : ''} font-sans text-darkGray font-light text-3.5xl md:text-3.75xl`}>
@@ -90,7 +90,7 @@ const clearFilter = () => {
             <button 
               onClick={handleLoadMore} 
               disabled={disabledLoadMore} 
-              className={`disabled:opacity-50 w-48 md:w-[486px] font-arial border hover:text-white hover:bg-textBlue border-textBlue text-textBlue text-sm uppercase h-11 transition-all duration-300 ease-in-out ${disabledLoadMore ? 'additional-disabled-class' : ''}`}
+              className={`disabled:opacity-50 w-48 md:w-[486px] font-arial border hover:text-white hover:bg-textBlue border-textBlue text-textBlue text-sm uppercase h-11 transition-all duration-300 ease-in-out disabled:pointer-events-none disabled:cursor-default ${disabledLoadMore ? 'additional-disabled-class' : ''}`}
             >
               {disabledLoadMore ? (
                 <span className='btn-loader'></span>
