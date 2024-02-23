@@ -17,6 +17,8 @@ export default function Home() {
   const [planetsLoaded, setPlanetsLoaded] = useState(false)
   const [disabledLoadMore, setDisabledLoadMore] = useState(true)
   const [filteredPeople, setFilteredPeople] = useState([])
+  const [disabledClearBtn, setDisabledClearBtn] = useState(true)
+  const [totalFilteredPeopleCount, setTotalFilteredPeopleCount] = useState(0)
 
   useEffect(() => {
     setIsLoading(true)
@@ -107,6 +109,7 @@ export default function Home() {
 
       setTotalPeopleCount(data.count)
       setPeople(prev => [...prev, ...newPeople])
+      setFilteredPeople(people)
       setIsLoading(false)
     } catch (error) {
       console.error("Failed to fetch people:", error)
@@ -135,6 +138,8 @@ export default function Home() {
         })
 
         setPeople(prev => [...prev, ...newPeople])
+        setTotalFilteredPeopleCount(people.length)
+        setFilteredPeople(people)
         if (!data.next) {
           setDisabledLoadMore(false)
           break
@@ -159,18 +164,25 @@ export default function Home() {
     setDisplayCount(newDisplayCount)
   }
 
-
+  const clearFilter = () => {
+    setFilteredPeople(people)
+    setSelectedFilter('All')
+    setDisabledClearBtn(true)
+    setDisplayCount(8)
+    setTotalFilteredPeopleCount(filteredPeople.length)
+  }
 
   const handleFilterChange = (selected) => {
     setSelectedFilter(selected.label)
 
-    // Filtra a lista de pessoas com base no filtro selecionado
-    const filteredPeople = selected.label === 'All' 
-      ? people 
+    const filtered = selected.label === 'All' 
+      ? people
       : people.filter(person => selected.value.includes(person.url))
 
-    setPeople(filteredPeople) // Atualiza a lista de pessoas com o resultado filtrado
-    setDisplayCount(Math.min(filteredPeople.length, 8)) // Reinicia displayCount ou ajusta baseado no resultado filtrado
+    setDisabledClearBtn(false)
+    setFilteredPeople(filtered) 
+    setDisplayCount(Math.min(filtered.length, 8))
+    setTotalFilteredPeopleCount(filteredPeople.length)
   }
 
   return (
@@ -184,16 +196,16 @@ export default function Home() {
       </header>
       <div className="h-14 md:h-[90px] flex justify-between items-center border-t md:border-y border-borderGray w-full px-[25px] md:px-[50px]">
         <Filter options={planetOptions} onChange={handleFilterChange} />
-        <button className='hidden md:flex items-center uppercase border border-filterGray text-filterGray tracking-[0.8px] font-arial text-sm h-9 px-10'>Clear all</button>
+        <button disabled={disabledClearBtn} className='hidden md:flex items-center uppercase border border-textBlue text-textBlue disabled:border-filterGray disabled:text-filterGray tracking-[0.8px] font-arial text-sm h-9 px-10' onClick={clearFilter}>Clear all</button>
       </div>
       <section className="p-[25px] md:p-[50px]">
         <h1 className='capitalize font-sans text-darkGray font-light text-3.5xl md:text-3.75xl'>{selectedFilter} Characters</h1>
         <div className='grid grid-cols-1 md:grid-cols-4 w-full gap-y-11 md:gap-8 md:gap-y-28 my-8 mb-11 md:mb-28'>
-          {people.slice(0, displayCount).map((person, index) => (
+          {filteredPeople.slice(0, displayCount).map((person, index) => (
             <Card key={index} data={person} />
           ))}
         </div>
-        {displayCount < totalPeopleCount && (
+        {displayCount < totalFilteredPeopleCount && (
           <div className='flex justify-center'>
             <button 
               onClick={handleLoadMore} 
