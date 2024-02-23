@@ -26,6 +26,7 @@ export default function Home() {
   const handleLoadMore = () => {
 
     let newDisplayCount = displayCount + 8
+    console.log(totalFilteredPeopleCount)
 
     if (newDisplayCount > filteredPeople.length) {
       newDisplayCount = filteredPeople.length

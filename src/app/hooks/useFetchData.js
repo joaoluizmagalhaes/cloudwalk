@@ -126,9 +126,13 @@ const useFetchData = () => {
           }
         })
 
-        setPeople(prev => [...prev, ...newPeople])
-        setTotalFilteredPeopleCount(people.length)
-        setFilteredPeople(people)
+        setPeople(prev => {
+          const updatedPeople = [...prev, ...newPeople]
+          setFilteredPeople(updatedPeople) 
+          setTotalFilteredPeopleCount(updatedPeople.length)
+          return updatedPeople
+        })
+
         if (!data.next) {
           setDisabledLoadMore(false)
           break
